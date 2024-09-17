@@ -1,0 +1,18 @@
+GET http://localhost:3333/species/species-all
+
+###
+
+POST  http://localhost:3333/species/specie-create
+Content-Type: application/json
+
+{
+    "nomePopular": "Tatu-Mulita",
+    "nomeCientifico": "Dasypus hybridus",
+    "reino": "Animalia",
+    "filo": "Chordata",
+    "classe": "Mammalia",
+    "ordem": "Cingulata",
+    "familia": "Dasypodidae",
+    "genero": "Dasypus",
+    "especie": "hybridus"
+}
