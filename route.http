@@ -16,3 +16,13 @@ Content-Type: application/json
     "genero": "Dasypus",
     "especie": "hybridus"
 }
+
+###
+
+POST http://localhost:3333/admins/admins-login
+Content-Type: application/json
+
+{
+    "email": "gabriel@gmail.com",
+    "senha": "teste@"
+}

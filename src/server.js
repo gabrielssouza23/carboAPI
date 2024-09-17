@@ -12,12 +12,6 @@ for (const { prefix, route } of getAllRoutes()) {
 }
 
 export default async function bootstrap() {
-    // fastify.listen(
-    //     {
-    //         port: 3333,
-            
-    //     }
-    // )
   try {
     await fastify.listen({ port: 3333});
   } catch (err) {

@@ -1,4 +1,5 @@
 import speciesRoutes from "./species.js";
+  import adminsRoutes from "./admins.js";
 
 const router = [
     {
@@ -8,8 +9,8 @@ const router = [
     },
     {
       prefix: "admins",
-      route: usersRoutes,
-      private: ["/admins/admins-login"],
+      route: adminsRoutes,
+      public: ["/admins/admins-login"],
     }
   ];
 
