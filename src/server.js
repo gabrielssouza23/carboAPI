@@ -1,8 +1,13 @@
 import Fastify from "fastify";
 import getAllRoutes from "./routes/index.js";
+import cors from '@fastify/cors'
 
 const fastify = Fastify({
   logger: true,
+});
+
+fastify.register(cors, {
+  origin: '*', 
 });
 
 // fastify.addHook("onRequest", onRequest);

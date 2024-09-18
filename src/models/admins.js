@@ -1,7 +1,9 @@
 import { sql } from "../dbConn/db.js";
 import { createHash } from "node:crypto";
 import jwt from 'jsonwebtoken';
+import 'dotenv/config';
 
+const JWT_SECRET = process.env.JWT_SECRET;
 
 export async function login(loginInfo) {
   const { email, senha } = loginInfo;
