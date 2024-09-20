@@ -2,20 +2,27 @@ GET http://localhost:3333/species/species-all
 
 ###
 
+GET http://localhost:3333/species/species-all-catalog
+
+###
+
 POST  http://localhost:3333/species/specie-create
 Content-Type: application/json
 
 {
-    "nomePopular": "Tatu-Mulita",
-    "nomeCientifico": "Dasypus hybridus",
-    "reino": "Animalia",
-    "filo": "Chordata",
-    "classe": "Mammalia",
-    "ordem": "Cingulata",
-    "familia": "Dasypodidae",
-    "genero": "Dasypus",
-    "especie": "hybridus"
+  "nomePopular": "Quero-Quero",
+  "nomeCientifico": "Vanellus chilensis",
+  "reino": "Animalia",
+  "filo": "Chordata",
+  "classe": "Aves",
+  "ordem": "Charadriiformes",
+  "familia": "Charadriidae",
+  "genero": "Vanellus",
+  "especie": "chilensis",
+    "descricao": "O quero-quero é uma ave da família dos caradriídeos, também conhecido como abibe-do-sul, abibe, agachona, apereá ou terecã. O nome científico é Vanellus chilensis. O quero-quero é uma ave típica da América do Sul, sendo encontrado desde a Argentina e leste da Bolívia até a margem direita do rio Amazonas, no Brasil."
 }
+
+
 
 ###
 

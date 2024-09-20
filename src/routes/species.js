@@ -1,4 +1,4 @@
-import { getAllSpecies, createSpecie } from '../models/species.js';
+import { getAllSpecies, createSpecie, getAllSpeciesCatalog } from '../models/species.js';
 import fastify from 'fastify';
 
   export default async function speciesRoutes(fastify) {
@@ -15,6 +15,20 @@ import fastify from 'fastify';
       }
     
     });
+
+      fastify.get("/species-all-catalog", async (request, reply) => {
+        
+        try{
+          const allSpeciesCatalog = await getAllSpeciesCatalog();
+  
+          return reply.status(200).send(allSpeciesCatalog);
+  
+        } catch (error){
+          return reply.status(500).send({ error: 'Erro ao buscar espécies', details: error.message });
+  
+        }
+      
+      });
 
     fastify.post("/specie-create", async (request, reply) => {
       
