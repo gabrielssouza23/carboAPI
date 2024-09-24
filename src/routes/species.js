@@ -1,13 +1,13 @@
-import { getAllSpecies, createSpecie, getAllSpeciesCatalog } from '../models/species.js';
+import { createSpecie, getAllSpeciesCatalog, getSpecie } from '../models/species.js';
 import fastify from 'fastify';
 
   export default async function speciesRoutes(fastify) {
-    fastify.get("/species-all", async (request, reply) => {
+    fastify.get("/specie/:specieId", async (request, reply) => {
       
       try{
-        const allSpecies = await getAllSpecies();
+        const specie = await getSpecie(request.params.specieId);
 
-        return reply.status(200).send(allSpecies);
+        return reply.status(200).send(specie);
 
       } catch (error){
         return reply.status(500).send({ error: 'Erro ao buscar espécies', details: error.message });
@@ -41,6 +41,20 @@ import fastify from 'fastify';
 
       } catch (error){
         return reply.status(500).send({ error: 'Erro ao criar espécie', details: error.message });
+
+      }
+    
+    });
+
+    fastify.get("/specie-contributions/:specieId", async (request, reply) => {
+      
+      try{
+        const contributions = await getSpecieContributions(request.params.specieId);
+
+        return reply.status(200).send(specie);
+
+      } catch (error){
+        return reply.status(500).send({ error: 'Erro ao buscar espécies', details: error.message });
 
       }
     

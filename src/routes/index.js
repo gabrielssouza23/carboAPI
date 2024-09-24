@@ -5,7 +5,7 @@ const router = [
     {
       prefix: "species",
       route: speciesRoutes,
-      public: ["/species/species-all, /species/species-all-catalog ,  /species/specie-create"],
+      public: ["/species/specie/:specieId, /species/species-all-catalog ,  /species/specie-create"],
     },
     {
       prefix: "admins",
