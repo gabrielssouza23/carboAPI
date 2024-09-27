@@ -6,23 +6,35 @@ GET http://localhost:3333/species/species-all-catalog
 
 ###
 
-POST  http://localhost:3333/species/specie-create
-Content-Type: application/json
+
+GET http://localhost:3333/species/species-all-crud
+
+###
+POST http://localhost:3333/species/specie-create
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEiLCJlbWFpbCI6ImdhYnJpZWxAZ21haWwuY29tIiwiaWF0IjoxNzI3MzA1OTE2LCJleHAiOjE3MjczMDk1MTZ9.SroNTSO6H4P1WpBdsNhQo2eidZWn-TNX5D16T6IZOOc
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="dados"
 
 {
-  "nomePopular": "Antúrio",
-  "nomeCientifico": "Anthurium andraeanum",
-  "reino": "Plantae",
-  "filo": "Angiosperms",
-  "classe": "Monocots",
-  "ordem": "Sórdida",
-  "familia": "Araceae",
-  "genero": "Anthurium",
-  "especie": "andraeanum",
-  "descricao": "O antúrio, conhecido cientificamente como Anthurium andraeanum, é uma planta ornamental muito apreciada por suas flores vibrantes e duradouras, que vêm em várias cores, como vermelho, rosa e branco. É nativa das florestas tropicais da Colômbia e do Equador, mas também é amplamente cultivada em outras regiões tropicais e subtropicais. O antúrio é frequentemente usado em arranjos florais e decoração de interiores devido à sua beleza e resistência."
+  "nomePopular": "Preá",
+  "nomeCientifico": "Galea spixii",
+  "reino": "Animalia",
+  "filo": "Chordata",
+  "classe": "Mammalia",
+  "ordem": "Rodentia",
+  "familia": "Caviidae",
+  "genero": "Galea",
+  "especie": "spixii",
+  "descricao": "O preá, cientificamente chamado de Galea spixii, é um roedor nativo da América do Sul, comumente encontrado no Brasil, Argentina e Paraguai. Ele habita áreas de vegetação densa, como savanas e florestas tropicais. O preá é herbívoro e se alimenta de gramíneas e folhas. É um animal pequeno e ágil, com pelagem curta e de cor variando entre o marrom e o cinza. Ele é frequentemente comparado à capivara, embora seja menor."
 }
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="imagem"; filename="queroquero.jpg"
+Content-Type: image/jpeg
 
-
+# [conteúdo binário da imagem aqui]
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
 
 ###
 

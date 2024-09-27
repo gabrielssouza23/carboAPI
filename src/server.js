@@ -1,6 +1,8 @@
 import Fastify from "fastify";
 import getAllRoutes from "./routes/index.js";
 import cors from '@fastify/cors'
+import authPlugin from './plugins/authPlugin.js'; // O plugin que criamos
+import fastifyMultipart from '@fastify/multipart';
 
 const fastify = Fastify({
   logger: true,
@@ -10,7 +12,10 @@ fastify.register(cors, {
   origin: '*', 
 });
 
-// fastify.addHook("onRequest", onRequest);
+// Registre o plugin de autenticação
+fastify.register(authPlugin);
+fastify.register(fastifyMultipart);
+
 
 for (const { prefix, route } of getAllRoutes()) {
   await fastify.register(route, { prefix });

@@ -49,8 +49,6 @@ export async function getSpecieContributions(id) {
 }
 
 export async function getAllSpeciesCatalog() {
-  // rodar e montar query aqui nessa bosta
-
   // const allSpeciesCatalog = await sql`SELECT e.id, e.nomePopular, e.nomeCientifico, STRING_AGG(si.speciesImage, ', ') AS all_images FROM especies e JOIN speciesImage si ON e.id = si.specieId GROUP BY e.id, e.nomePopular, e.nomeCientifico;`;
 
   const allSpeciesCatalog = await sql`SELECT e.id, e.nomePopular, e.nomeCientifico, e.catalogThumb thumb FROM especies e;`;
@@ -67,13 +65,55 @@ export async function getAllSpeciesCatalog() {
   return allSpeciesCatalog;
 }
 
-export async function createSpecie(specie){
-    const specieId = randomUUID();
+export async function getallSpeciesCrud() {
 
-    const { nomePopular, nomeCientifico, reino, filo, classe, ordem, familia, genero, especie, descricao} = specie;
+  const getallSpeciesCrud = await sql`SELECT e.* FROM especies e;`;
 
-    await sql`INSERT INTO especies (id, nomePopular, nomeCientifico, reino, filo, classe, ordem, familia, genero, especie, descricao)
-    VALUES (
-    ${specieId}, ${nomePopular}, ${nomeCientifico}, ${reino}, ${filo}, ${classe}, ${ordem}, ${familia}, ${genero}, ${especie}, ${descricao}         
-    );`
+  if (getallSpeciesCrud.length === 0) {
+      return {
+        error: true,
+        mode: "warning",
+        data: [],
+        message: "No species available",
+      };
+    }
+
+  return getallSpeciesCrud;
 }
+
+export async function createSpecie(specie, thumb) {
+  const specieId = randomUUID();
+
+  // Desestruturando as propriedades do objeto specie
+  const { 
+    nomePopular, 
+    nomeCientifico, 
+    reino, 
+    filo, 
+    classe, 
+    ordem, 
+    familia, 
+    genero, 
+    especie: especieField, // Renomeando a propriedade 'especie' para 'especieField'
+    descricao 
+  } = specie;
+
+  try {
+    await sql`
+      INSERT INTO especies (
+        id, nomePopular, nomeCientifico, reino, filo, classe, ordem, familia, genero, especie, descricao, catalogThumb
+      ) VALUES (
+        ${specieId}, ${nomePopular}, ${nomeCientifico}, ${reino}, ${filo}, ${classe}, ${ordem}, ${familia}, ${genero}, ${especieField}, ${descricao}, ${thumb}
+      );
+    `;
+    return { success: true, message: "Espécie criada com sucesso." };
+  } catch (error) {
+    console.error('Erro ao criar a espécie:', error.message);
+    return {
+      error: true,
+      mode: "error",
+      message: "Erro ao criar a espécie. " + error.message,
+    };
+  }
+}
+

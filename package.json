@@ -1,10 +1,16 @@
 {
   "dependencies": {
     "@fastify/cors": "^10.0.0",
+    "@fastify/multipart": "^9.0.1",
+    "axios": "^1.7.7",
     "dotenv": "^16.4.5",
     "fastify": "^5.0.0",
+    "fastify-multipart": "^5.4.0",
+    "fastify-plugin": "^5.0.1",
+    "form-auto-content": "^3.2.1",
     "jsonwebtoken": "^9.0.2",
-    "postgres": "^3.4.4"
+    "postgres": "^3.4.4",
+    "tap": "^21.0.1"
   },
   "name": "backendcarbonifera",
   "version": "1.0.0",
