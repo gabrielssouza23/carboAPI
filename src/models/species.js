@@ -25,6 +25,39 @@ export async function getSpecie(id) {
   return specie[0]; // Retornar o primeiro elemento se houver resultados
 }
 
+export async function getSpecieLocations(id) {
+  // Executar a consulta SQL
+  const locations = await sql`
+    SELECT sci.latitude, sci.longitude
+    FROM especies e 
+    JOIN specieContributionImg sci ON e.id = sci.specieId JOIN contributor c on sci.contributorId = c.id
+    WHERE e.id = ${id}
+    GROUP BY e.id, sci.latitude, sci.longitude;
+  `;
+
+  // Verificar se a consulta retornou resultados
+  if (locations.length === 0) {
+    return {
+      error: true,
+      mode: "warning",
+      data: [],
+      message: "No locations available",
+    };
+  }
+
+  const locationObj = locations.map((location) => {
+    return {
+      latitude: location.latitude,
+      longitude: location.longitude
+    }
+  });
+
+  return {
+    error: false,
+    data: locationObj
+  };
+}
+
 export async function getSpecieContributions(id) {
   // Executar a consulta SQL
   const contributions = await sql`
