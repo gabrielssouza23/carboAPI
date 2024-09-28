@@ -2,13 +2,6 @@ GET http://localhost:3333/species/specie/6c1b16cd-8ab3-44c4-9e7c-6de842d4d518
 
 ###
 
-GET http://localhost:3333/species/specie-contributions/6c1b16cd-8ab3-44c4-9e7c-6de842d4d518
-
-###
-
-GET http://localhost:3333/species/specie-locations/6c1b16cd-8ab3-44c4-9e7c-6de842d4d518
-
-###
 GET http://localhost:3333/species/species-all-catalog
 
 ###

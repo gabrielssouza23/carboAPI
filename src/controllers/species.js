@@ -3,15 +3,11 @@ import 'dotenv/config';
 import { createSpecie } from '../models/species.js';
 
 export async function catalogSpecie(data, thumb) {
-  // Certifique-se de que 'data' contém as propriedades esperadas
-  console.log('Imagem thumb:', thumb);
-  console.log('Dados da espécie:', data); // Isso contém as outras propriedades de data
 
   try {
     // Criação do FormData para enviar a imagem
     const formData = new FormData();
-    // formData.append('key', process.env.IMGBB_API_KEY); // Sua chave da API
-    formData.append('key', '7725ca9ebc645660b3ff805605a53dcb'); // Sua chave da API
+    formData.append('key', process.env.IMGBB_API_KEY); // Sua chave da API
     formData.append('image', thumb); // Sua imagem em base64 ou binária
 
     // Envio da imagem para ImgBB
