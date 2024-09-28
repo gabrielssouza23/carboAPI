@@ -61,11 +61,11 @@ export async function getSpecieLocations(id) {
 export async function getSpecieContributions(id) {
   // Executar a consulta SQL
   const contributions = await sql`
-    SELECT e.*, STRING_AGG(si.speciesImage, ', ') AS all_images, STRING_AGG(sr.reference, '; ') AS all_references
+    SELECT STRING_AGG(sci.image, ', ') AS all_images, STRING_AGG(c.name, ', ') AS all_names
     FROM especies e 
-    JOIN speciesImage si ON e.id = si.specieId join specieReferences sr on e.id = sr.specieId
-        WHERE e.id = ${id} 
-    GROUP BY e.id, e.nomePopular, e.nomeCientifico;
+    JOIN specieContributionImg sci ON e.id = sci.specieId JOIN contributor c on sci.contributorId = c.id
+    WHERE e.id = ${id}
+    GROUP BY e.id;
   `;
 
   // Verificar se a consulta retornou resultados
