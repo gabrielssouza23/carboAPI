@@ -1,4 +1,4 @@
-import { createSpecie, getAllSpeciesCatalog, getSpecie, getallSpeciesCrud, getSpecieLocations } from '../models/species.js';
+import { createSpecie, getAllSpeciesCatalog, getSpecie, getallSpeciesCrud, getSpecieLocations, getSpecieContributions } from '../models/species.js';
 import { catalogSpecie } from '../controllers/species.js';
 import fastify from 'fastify';
 
