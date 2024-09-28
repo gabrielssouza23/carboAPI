@@ -66,6 +66,15 @@ export default async function speciesRoutes(fastify) {
           return reply.status(500).send({ error: 'Erro ao buscar espécies', details: error.message });
         }
       });
+  // Rota para buscar localizações de uma espécie
+  fastify.get("/specie-locations/:specieId", async (request, reply) => {
+    try {
+      const locations = await getSpecieLocations(request.params.specieId);
+      return reply.status(200).send(locations);
+    } catch (error) {
+      return reply.status(500).send({ error: 'Erro ao buscar localizações', details: error.message });
+    }
+  });
   }
   
   
