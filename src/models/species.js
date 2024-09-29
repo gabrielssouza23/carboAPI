@@ -114,8 +114,10 @@ export async function getallSpeciesCrud() {
   return getallSpeciesCrud;
 }
 
-export async function createSpecie(specie, thumb) {
+export async function createSpecie(specie, thumb, extraImagesUrl) {
   const specieId = randomUUID();
+
+  console.log('Extra images:', extraImagesUrl);
 
   // Desestruturando as propriedades do objeto specie
   const { 
@@ -128,7 +130,8 @@ export async function createSpecie(specie, thumb) {
     familia, 
     genero, 
     especie: especieField, // Renomeando a propriedade 'especie' para 'especieField'
-    descricao 
+    descricao, 
+    references
   } = specie;
 
   try {
@@ -139,6 +142,28 @@ export async function createSpecie(specie, thumb) {
         ${specieId}, ${nomePopular}, ${nomeCientifico}, ${reino}, ${filo}, ${classe}, ${ordem}, ${familia}, ${genero}, ${especieField}, ${descricao}, ${thumb}
       );
     `;
+
+    // Inserir as referências da espécie
+    for (let i = 0; i < references.length; i++) {
+      await sql`
+        INSERT INTO specieReferences (
+          reference, specieId
+        ) VALUES (
+           ${references[i]}, ${specieId}
+        );
+      `;
+    }
+
+    // Inserir as imagens extras da espécie
+    for (let i = 0; i < extraImagesUrl.length; i++) {
+      await sql`
+        INSERT INTO speciesImage (
+          speciesImage, specieId
+        ) VALUES (
+           ${extraImagesUrl[i]}, ${specieId}
+        );
+      `;
+    }
     return { success: true, message: "Espécie criada com sucesso." };
   } catch (error) {
     console.error('Erro ao criar a espécie:', error.message);

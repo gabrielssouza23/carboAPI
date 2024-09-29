@@ -35,7 +35,6 @@ export default async function speciesRoutes(fastify) {
     preHandler: [fastify.authenticate],
   }, async (request, reply) => {
     try {
-      console.log(request.body);
       const thumbBase64 = request.body.thumb; // Obtém a imagem em base64
   
       // Passa os dados para a função catalogSpecie
@@ -43,7 +42,6 @@ export default async function speciesRoutes(fastify) {
   
       // Formata a resposta
       const formattedResponse = {
-        teste: response.teste,
         data: response.data,
         success: true,
         status: response.status || 200
