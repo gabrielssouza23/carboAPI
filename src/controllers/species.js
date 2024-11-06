@@ -1,6 +1,6 @@
 import axios from 'axios';
 import 'dotenv/config';
-import { createSpecie } from '../models/species.js';
+import { createSpecie, createContributionModel } from '../models/species.js';
 
 export async function catalogSpecie(data, thumb) {
 
@@ -61,7 +61,51 @@ export async function catalogSpecie(data, thumb) {
     console.error('Erro ao enviar para ImgBB:', error.message);
     console.error('Detalhes do erro:', error.response?.data || error);
     throw new Error('Erro ao enviar a imagem para ImgBB');
+  }  
+}
+
+export async function createContribution(data) {
+  try {
+    // Verificação se data e images estão definidos
+    
+    if (!data || !data.images || !data.imagesGps) {
+      throw new Error('Dados incompletos: "images" ou "imagesGps" não estão definidos.');
+    }
+
+    const { images, imagesGps } = data; // Agora você pode desestruturar com segurança
+
+    console.log("DATA RECEBIDA :::", imagesGps);
+
+    let arrayObjContribuicao = [];
+    for (let i = 0; i < images.length; i++) {
+      const formData = new FormData();
+      formData.append('key', process.env.IMGBB_API_KEY); // Sua chave da API
+      formData.append('image', images[i]); // Sua imagem em base64 ou binária
+      const response = await axios.post('https://api.imgbb.com/1/upload', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      
+      images[i] = response.data.data.url;
+      
+      let objContribuicao = {
+        image: images[i],
+        latitude: imagesGps[i].latitude,
+        longitude: imagesGps[i].longitude,
+        date: imagesGps[i].dateFile,
+      };
+      
+      arrayObjContribuicao.push(objContribuicao);
+    }
+
+    return await createContributionModel(data, arrayObjContribuicao);
+  } catch (error) {
+    console.error('Erro ao enviar para ImgBB:', error.message);
+    console.error('Detalhes do erro:', error.response?.data || error);
+    throw new Error('Erro ao enviar a imagem para ImgBB');
   }
 }
+
 
 

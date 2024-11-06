@@ -1,5 +1,5 @@
-import { createSpecie, getAllSpeciesCatalog, getSpecie, getallSpeciesCrud, getSpecieLocations, getSpecieContributions } from '../models/species.js';
-import { catalogSpecie } from '../controllers/species.js';
+import { createSpecie, getAllSpeciesCatalog, getSpecie, getallSpeciesCrud, getSpecieLocations, getSpecieContributions, getSpecieCount } from '../models/species.js';
+import { catalogSpecie, createContribution } from '../controllers/species.js';
 import fastify from 'fastify';
 
 export default async function speciesRoutes(fastify) {
@@ -14,12 +14,31 @@ export default async function speciesRoutes(fastify) {
 
   fastify.get("/species-all-catalog", async (request, reply) => {
     try {
-      const allSpeciesCatalog = await getAllSpeciesCatalog();
+      const limit = request.query.limit || 10;
+      const offset = request.query.offset || 0;
+      const allSpeciesCatalog = await getAllSpeciesCatalog(limit, offset);
+  
+      if (allSpeciesCatalog.error) {
+        return reply.status(404).send({ 
+          error: allSpeciesCatalog.mode, 
+          message: allSpeciesCatalog.message 
+        });
+      }
+  
       return reply.status(200).send(allSpeciesCatalog);
     } catch (error) {
       return reply.status(500).send({ error: 'Erro ao buscar espécies', details: error.message });
     }
   });
+
+  fastify.get("/species-count", async (request, reply) => {
+    try {
+      const speciesCount = await getSpecieCount();
+      return reply.status(200).send({ count: speciesCount });
+    } catch (error) {
+      return reply.status(500).send({ error: 'Erro ao buscar espécies', details: error.message });
+    }
+  });  
 
   fastify.get("/species-all-crud", async (request, reply) => {
     try {
@@ -73,7 +92,27 @@ export default async function speciesRoutes(fastify) {
       return reply.status(500).send({ error: 'Erro ao buscar localizações', details: error.message });
     }
   });
-  }
+
+  fastify.post("/contribution-create", {
+  }, async (request, reply) => {
+    try {  
+      // Passa os dados para a função catalogSpecie
+      const response = await createContribution(request.body);
+  
+      // Envia a resposta de sucesso
+      const formattedResponse = {
+        data: response.data,
+        success: true,
+        status: response.status || 200
+      };
+      return reply.status(201).send(formattedResponse);
+    } catch (error) {
+      // Envia a resposta de erro
+      return reply.status(500).send({ error: 'Erro ao criar contribution', details: error.message });
+    }
+    
+  })
+}
   
   
   

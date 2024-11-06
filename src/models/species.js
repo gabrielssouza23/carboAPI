@@ -81,21 +81,26 @@ export async function getSpecieContributions(id) {
   return contributions[0]; // Retornar o primeiro elemento se houver resultados
 }
 
-export async function getAllSpeciesCatalog() {
-  // const allSpeciesCatalog = await sql`SELECT e.id, e.nomePopular, e.nomeCientifico, STRING_AGG(si.speciesImage, ', ') AS all_images FROM especies e JOIN speciesImage si ON e.id = si.specieId GROUP BY e.id, e.nomePopular, e.nomeCientifico;`;
+export async function getAllSpeciesCatalog(limit, offset) {
 
-  const allSpeciesCatalog = await sql`SELECT e.id, e.nomePopular, e.nomeCientifico, e.catalogThumb thumb FROM especies e;`;
+  const allSpeciesCatalog = await sql`SELECT e.id, e.nomePopular, e.nomeCientifico, e.catalogThumb thumb FROM especies e LIMIT ${limit} OFFSET ${offset};`;
 
   if (allSpeciesCatalog.length === 0) {
-      return {
-        error: true,
-        mode: "warning",
-        data: [],
-        message: "No species available",
-      };
-    }
+    return {
+      error: true,
+      mode: "warning",
+      data: [],
+      message: "No species available",
+    };
+  }
 
   return allSpeciesCatalog;
+}
+
+export async function getSpecieCount() {
+  const speciesCount = await sql`SELECT COUNT(*) FROM especies;`;
+
+  return speciesCount[0].count;
 }
 
 export async function getallSpeciesCrud() {
@@ -103,13 +108,13 @@ export async function getallSpeciesCrud() {
   const getallSpeciesCrud = await sql`SELECT e.* FROM especies e;`;
 
   if (getallSpeciesCrud.length === 0) {
-      return {
-        error: true,
-        mode: "warning",
-        data: [],
-        message: "No species available",
-      };
-    }
+    return {
+      error: true,
+      mode: "warning",
+      data: [],
+      message: "No species available",
+    };
+  }
 
   return getallSpeciesCrud;
 }
@@ -120,17 +125,17 @@ export async function createSpecie(specie, thumb, extraImagesUrl) {
   console.log('Extra images:', extraImagesUrl);
 
   // Desestruturando as propriedades do objeto specie
-  const { 
-    nomePopular, 
-    nomeCientifico, 
-    reino, 
-    filo, 
-    classe, 
-    ordem, 
-    familia, 
-    genero, 
+  const {
+    nomePopular,
+    nomeCientifico,
+    reino,
+    filo,
+    classe,
+    ordem,
+    familia,
+    genero,
     especie: especieField, // Renomeando a propriedade 'especie' para 'especieField'
-    descricao, 
+    descricao,
     references
   } = specie;
 
@@ -171,6 +176,66 @@ export async function createSpecie(specie, thumb, extraImagesUrl) {
       error: true,
       mode: "error",
       message: "Erro ao criar a espécie. " + error.message,
+    };
+  }
+
+}
+export async function createContributionModel(data, contributionObj) {
+  const { name, email, location, date, phone } = data;
+
+  // console.log(date);
+
+  try {
+    // Inserir as contribuições da espécie
+    for (let i = 0; i < contributionObj.length; i++) {
+      let dateContribution = contributionObj[i].date; // Usar a data correta do JSON
+      // console.log('Data de contribuição:', contributionObj[i].dateFile);
+      if (dateContribution === 'N/A') {
+        dateContribution = date; // Usar a data padrão se for 'N/A'
+      }
+
+      if (contributionObj[i].longitude === 'N/A') {
+        contributionObj[i].longitude = null;
+        contributionObj[i].latitude = null;
+      }
+
+      console.log('Valores a serem inseridos:', {
+        image: contributionObj[i].image,
+        latitude: contributionObj[i].latitude,
+        longitude: contributionObj[i].longitude,
+        dateContribution,
+        email,
+        location,
+        phone,
+        exibir: 'Não',
+        name
+      });
+      
+      // Realizar o INSERT ignorando specieId e contributorId
+      await sql`
+        INSERT INTO speciecontributionimg (
+          image, latitude, longitude, data, email, location, phone, exibir, name
+        ) VALUES (
+          ${contributionObj[i].image}, 
+          ${contributionObj[i].latitude}, 
+          ${contributionObj[i].longitude}, 
+          ${dateContribution}, 
+          ${email}, 
+          ${location}, 
+          ${phone}, 
+          'Não',
+          ${name}
+        );
+      `;
+    }
+
+    return { success: true, message: "Contribuição criada com sucesso." };
+  } catch (error) {
+    console.error('Erro ao criar a contribuição:', error.message);
+    return {
+      error: true,
+      mode: "error",
+      message: "Erro ao criar a contribuição. " + error.message,
     };
   }
 }
