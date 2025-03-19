@@ -1,5 +1,5 @@
 import { createSpecie, getAllSpeciesCatalog, getSpecie, getallSpeciesCrud, getSpecieLocations, getSpecieContributions, getSpecieCount } from '../models/species.js';
-import { catalogSpecie, createContribution } from '../controllers/species.js';
+import { catalogSpecie, createContribution, analyzeImage } from '../controllers/species.js';
 import fastify from 'fastify';
 
 export default async function speciesRoutes(fastify) {
@@ -111,6 +111,17 @@ export default async function speciesRoutes(fastify) {
       return reply.status(500).send({ error: 'Erro ao criar contribution', details: error.message });
     }
     
+  })
+
+  fastify.post("/analyze-image", {
+  }, async (request, reply) => {
+    try {
+      const response = await analyzeImage(request.body.image);
+
+      return reply.status(201).send(response);
+    } catch(error){
+      return reply.status(500).send({ error: 'Erro ao analisar imagem', details: error.message });
+    }
   })
 }
   

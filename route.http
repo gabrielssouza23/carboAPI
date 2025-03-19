@@ -29,12 +29,6 @@ Content-Disposition: form-data; name="dados"
   "especie": "spixii",
   "descricao": "O preá, cientificamente chamado de Galea spixii, é um roedor nativo da América do Sul, comumente encontrado no Brasil, Argentina e Paraguai. Ele habita áreas de vegetação densa, como savanas e florestas tropicais. O preá é herbívoro e se alimenta de gramíneas e folhas. É um animal pequeno e ágil, com pelagem curta e de cor variando entre o marrom e o cinza. Ele é frequentemente comparado à capivara, embora seja menor."
 }
-------WebKitFormBoundary7MA4YWxkTrZu0gW
-Content-Disposition: form-data; name="imagem"; filename="queroquero.jpg"
-Content-Type: image/jpeg
-
-# [conteúdo binário da imagem aqui]
-------WebKitFormBoundary7MA4YWxkTrZu0gW--
 
 ###
 

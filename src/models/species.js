@@ -5,11 +5,15 @@ import { randomUUID } from "node:crypto"
 export async function getSpecie(id) {
   // Executar a consulta SQL
   const specie = await sql`
-    SELECT e.*, STRING_AGG(si.speciesImage, ', ') AS all_images, STRING_AGG(sr.reference, '; ') AS all_references
-    FROM especies e 
-    JOIN speciesImage si ON e.id = si.specieId join specieReferences sr on e.id = sr.specieId
-        WHERE e.id = ${id} 
-    GROUP BY e.id, e.nomePopular, e.nomeCientifico;
+        SELECT e.*, img.all_images, ref.all_references FROM especies e LEFT JOIN (
+	 SELECT specieId, STRING_AGG(speciesImage, ', ') AS all_images
+    FROM speciesImage
+    GROUP BY specieId) img ON e.id = img.specieId
+LEFT JOIN (
+    SELECT specieId, STRING_AGG(reference, '; ') AS all_references
+    FROM specieReferences
+    GROUP BY specieId
+) ref ON e.id = ref.specieId WHERE e.id = ${id};
   `;
 
   // Verificar se a consulta retornou resultados
@@ -27,10 +31,17 @@ export async function getSpecie(id) {
 
 export async function getSpecieLocations(id) {
   // Executar a consulta SQL
+  // const locations = await sql`
+  //   SELECT sci.latitude, sci.longitude
+  //   FROM especies e 
+  //   JOIN specieContributionImg sci ON e.id = sci.specieId JOIN contributor c on sci.contributorId = c.id
+  //   WHERE e.id = ${id}
+  //   GROUP BY e.id, sci.latitude, sci.longitude;
+  // `;
   const locations = await sql`
-    SELECT sci.latitude, sci.longitude
+     SELECT sci.latitude, sci.longitude
     FROM especies e 
-    JOIN specieContributionImg sci ON e.id = sci.specieId JOIN contributor c on sci.contributorId = c.id
+    JOIN specieContributionImg sci ON e.id = sci.specieId
     WHERE e.id = ${id}
     GROUP BY e.id, sci.latitude, sci.longitude;
   `;
@@ -60,14 +71,21 @@ export async function getSpecieLocations(id) {
 
 export async function getSpecieContributions(id) {
   // Executar a consulta SQL
-  const contributions = await sql`
-    SELECT STRING_AGG(sci.image, ', ') AS all_images, STRING_AGG(c.name, ', ') AS all_names
-    FROM especies e 
-    JOIN specieContributionImg sci ON e.id = sci.specieId JOIN contributor c on sci.contributorId = c.id
-    WHERE e.id = ${id}
-    GROUP BY e.id;
-  `;
+  // const contributions = await sql`
+  //   SELECT STRING_AGG(sci.image, ', ') AS all_images, STRING_AGG(c.name, ', ') AS all_names
+  //   FROM especies e 
+  //   JOIN specieContributionImg sci ON e.id = sci.specieId JOIN contributor c on sci.contributorId = c.id
+  //   WHERE e.id = ${id}
+  //   GROUP BY e.id;
+  // `;
 
+  const contributions = await sql`
+  SELECT STRING_AGG(sci.image, ', ') AS all_images
+    FROM especies e 
+    JOIN specieContributionImg sci ON e.id = sci.specieId
+    WHERE e.id = ${id}
+    GROUP BY e.id`;
+  
   // Verificar se a consulta retornou resultados
   if (contributions.length === 0) {
     return {
