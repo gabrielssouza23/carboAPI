@@ -232,7 +232,7 @@ export async function createContributionModel(data, contributionObj) {
       // Realizar o INSERT ignorando specieId e contributorId
       await sql`
         INSERT INTO speciecontributionimg (
-          image, latitude, longitude, data, email, location, phone, exibir, name
+          image,longitude, latitude, data, email, location, phone, exibir, name
         ) VALUES (
           ${contributionObj[i].image}, 
           ${contributionObj[i].latitude}, 
