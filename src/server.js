@@ -6,7 +6,7 @@ import fastifyMultipart from '@fastify/multipart';
 
 const fastify = Fastify({
   logger: true,
-  bodyLimit: 10485760 // 10 MB (o valor é em bytes)
+  bodyLimit: 100 * 1024 * 1024, // 100 MB
 });
 
 fastify.register(cors, {
