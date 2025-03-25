@@ -1,5 +1,6 @@
 import speciesRoutes from "./species.js";
   import adminsRoutes from "./admins.js";
+  import generic from "./generic.js"
 
 const router = [
     {
@@ -12,7 +13,13 @@ const router = [
       prefix: "admins",
       route: adminsRoutes,
       public: ["/admins/admins-login"],
-    }
+    },
+    {
+      prefix: "generic",
+      route: generic,
+      public: ["/generic/participacao"],
+    },
+
   ];
 
   export const getPublicRoutes = () => {
