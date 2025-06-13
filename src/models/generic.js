@@ -1,17 +1,15 @@
-import { sql } from "../dbConn/db.js";
+import { PrismaClient } from "../generated/prisma/index.js";
+
+const prisma = new PrismaClient();
 
 export async function createParticipation(body) {
-  // Executar a consulta SQL
-  const participation = await sql`
-    INSERT INTO participacoes (nome, localizacao, mensagem, contato)
-    VALUES (
-      ${body.name}, 
-      ${body.origin}, 
-      ${body.message || null}, 
-      ${body.contact || null}
-    )
-    RETURNING *;
-  `;
-  
+  const participation = await prisma.participacoes.create({
+    data: {
+      nome: body.name,
+      localizacao: body.origin,
+      mensagem: body.message || null,
+      contato: body.contact || null
+    }
+  });
   return participation;
 }
