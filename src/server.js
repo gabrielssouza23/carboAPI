@@ -1,8 +1,10 @@
 import Fastify from "fastify";
 import getAllRoutes from "./routes/index.js";
 import cors from '@fastify/cors'
-import authPlugin from './plugins/authPlugin.js'; // O plugin que criamos
+import authPlugin from './plugins/authPlugin.js';
 import fastifyMultipart from '@fastify/multipart';
+import fastifySwagger from '@fastify/swagger';
+import fastifySwaggerUi from '@fastify/swagger-ui';
 
 const fastify = Fastify({
   logger: true,
@@ -13,10 +15,25 @@ fastify.register(cors, {
   origin: '*', 
 });
 
-// Registre o plugin de autenticação
+// Swagger
+fastify.register(fastifySwagger, {
+  openapi: {
+    info: {
+      title: 'CarboAPI',
+      description: 'Documentação da API da Carbonífera',
+      version: '1.0.0',
+    },
+    servers: [
+      { url: 'http://localhost:3333', description: 'Servidor local' }
+    ],
+  },
+});
+fastify.register(fastifySwaggerUi, {
+  routePrefix: '/docs',
+});
+
 fastify.register(authPlugin);
 fastify.register(fastifyMultipart);
-
 
 for (const { prefix, route } of getAllRoutes()) {
   await fastify.register(route, { prefix });

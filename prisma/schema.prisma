@@ -1,0 +1,110 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider          = "postgresql"
+  url               = env("DATABASE_URL")
+  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+}
+enum Role {
+  USER
+  ADMIN
+}
+
+enum ImageOrigin {
+  SYSTEM       // Imagem cadastrada diretamente no sistema
+  CONTRIBUTION // Imagem vinda de contribuição de usuários
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String   @db.VarChar(255)
+  email     String   @unique @db.VarChar(255)
+  password  String
+  role      Role     @default(USER)
+  avatarUrl String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deletedAt DateTime?
+
+  contributions SpecieContribution[]
+
+  @@map("users")
+}
+
+model Species {
+  id              String              @id @db.VarChar(256)
+  commonName      String              @db.VarChar(255)
+  scientificName  String              @db.VarChar(255)
+  kingdom         String              @db.VarChar(100)
+  phylum          String              @db.VarChar(100)
+  class           String              @db.VarChar(100)
+  order           String              @db.VarChar(100)
+  family          String              @db.VarChar(100)
+  genus           String              @db.VarChar(100)
+  specie         String              @db.VarChar(100)
+  description     String?
+  thumbnailUrl    String?
+
+  images          SpecieImages[]
+  references      SpecieReference[]
+  contributions   SpecieContribution[]
+
+  @@map("species")
+}
+
+model SpecieReference {
+  id        Int     @id @default(autoincrement())
+  text      String
+  specieId String?
+  specie   Species? @relation(fields: [specieId], references: [id], onDelete: SetNull)
+
+  @@map("specie_references")
+}
+
+model SpecieContribution {
+  id         Int       @id @default(autoincrement())
+  userId     String?
+  specieId  String?
+  submittedAt DateTime @default(now())
+
+  latitude   Float?
+  longitude  Float?
+  location   String?   @db.VarChar(255)
+  phone      String?   @db.VarChar(255)
+  isPublic   Boolean   @default(false)
+
+  user       User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  specie    Species?  @relation(fields: [specieId], references: [id], onDelete: Cascade)
+  images     SpecieImages[]
+
+  @@map("specie_contributions")
+}
+
+model SpecieImages {
+  id                  Int               @id @default(autoincrement())
+  url                 String            @db.VarChar(255)
+  origin              ImageOrigin
+  approved            Boolean           @default(false)
+
+  specieId           String?           
+  contributionId      Int?
+
+  specie             Species?          @relation(fields: [specieId], references: [id], onDelete: Cascade)
+  contribution        SpecieContribution? @relation(fields: [contributionId], references: [id], onDelete: Cascade)
+
+  @@map("specie_images")
+}
+
+model Participation {
+  id         Int      @id @default(autoincrement())
+  name       String   @db.VarChar(100)
+  location   String   @db.VarChar(100)
+  message    String?
+  contact    String?  @db.VarChar(100)
+  createdAt  DateTime @default(now())
+
+  @@map("participations")
+}

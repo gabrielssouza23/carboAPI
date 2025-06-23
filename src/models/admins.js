@@ -1,9 +1,10 @@
-import { sql } from "../dbConn/db.js";
 import { createHash } from "node:crypto";
 import jwt from 'jsonwebtoken';
 import 'dotenv/config';
+import { PrismaClient } from "../generated/prisma/index.js";
 
 const JWT_SECRET = process.env.JWT_SECRET;
+const prisma = new PrismaClient();
 
 export async function login(loginInfo) {
   const { email, senha } = loginInfo;
@@ -12,9 +13,11 @@ export async function login(loginInfo) {
   const hashedPassword = createHash("sha512").update(senha).digest("hex");
 
   // Verificar o email no banco de dados
-  const authEmail = await sql`SELECT * FROM admins WHERE email = ${email};`;
+  const authEmail = await prisma.admins.findUnique({
+    where: { email }
+  });
 
-  if (authEmail.length === 0) {
+  if (!authEmail) {
     return {
       error: true,
       mode: "warning",
@@ -24,7 +27,7 @@ export async function login(loginInfo) {
   }
 
   // Comparar o hash da senha
-  const storedHash = authEmail[0].senha;
+  const storedHash = authEmail.senha;
 
   if (hashedPassword !== storedHash) {
     return {
@@ -37,18 +40,18 @@ export async function login(loginInfo) {
 
   // Gerar JWT
   const token = jwt.sign(
-    { id: authEmail[0].id, email: authEmail[0].email },
+    { id: authEmail.id, email: authEmail.email },
     JWT_SECRET,
-    { expiresIn: "1h" } // Define o tempo de expiração do token
+    { expiresIn: "1h" }
   );
 
   return {
     error: false,
     mode: "success",
     data: {
-      id: authEmail[0].id,
-      email: authEmail[0].email,
-      token: token, // Adiciona o token ao retorno
+      id: authEmail.id,
+      email: authEmail.email,
+      token: token,
     },
     message: "Login realizado",
   };
