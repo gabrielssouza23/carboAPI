@@ -4,75 +4,107 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider          = "postgresql"
+  url               = env("DATABASE_URL")
+  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+}
+enum Role {
+  USER
+  ADMIN
 }
 
-model admins {
-  id    String @id
-  nome  String @db.VarChar(255)
-  email String @db.VarChar(255)
-  senha String
+enum ImageOrigin {
+  SYSTEM       // Imagem cadastrada diretamente no sistema
+  CONTRIBUTION // Imagem vinda de contribuição de usuários
 }
 
-model contributor {
-  id    String @id
-  name  String @db.VarChar(255)
-  email String @db.VarChar(255)
+model User {
+  id        String   @id @default(uuid())
+  name      String   @db.VarChar(255)
+  email     String   @unique @db.VarChar(255)
+  password  String
+  role      Role     @default(USER)
+  avatarUrl String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deletedAt DateTime?
+
+  contributions SpecieContribution[]
+
+  @@map("users")
 }
 
-model especies {
-  id                    String                  @id @db.VarChar(256)
-  nomepopular           String                  @db.VarChar(255)
-  nomecientifico        String                  @db.VarChar(255)
-  reino                 String                  @db.VarChar(100)
-  filo                  String                  @db.VarChar(100)
-  classe                String                  @db.VarChar(100)
-  ordem                 String                  @db.VarChar(100)
-  familia               String                  @db.VarChar(100)
-  genero                String                  @db.VarChar(100)
-  especie               String                  @db.VarChar(100)
-  descricao             String?
-  catalogthumb          String?
-  speciecontributionimg speciecontributionimg[]
-  speciereferences      speciereferences[]
-  speciesimage          speciesimage[]
+model Species {
+  id              String              @id @db.VarChar(256)
+  commonName      String              @db.VarChar(255)
+  scientificName  String              @db.VarChar(255)
+  kingdom         String              @db.VarChar(100)
+  phylum          String              @db.VarChar(100)
+  class           String              @db.VarChar(100)
+  order           String              @db.VarChar(100)
+  family          String              @db.VarChar(100)
+  genus           String              @db.VarChar(100)
+  specie         String              @db.VarChar(100)
+  description     String?
+  thumbnailUrl    String?
+
+  images          SpecieImages[]
+  references      SpecieReference[]
+  contributions   SpecieContribution[]
+
+  @@map("species")
 }
 
-model participacoes {
-  id           Int       @id @default(autoincrement())
-  nome         String    @db.VarChar(100)
-  localizacao  String    @db.VarChar(100)
-  mensagem     String?
-  contato      String?   @db.VarChar(100)
-  data_criacao DateTime? @default(now()) @db.Timestamp(6)
+model SpecieReference {
+  id        Int     @id @default(autoincrement())
+  text      String
+  specieId String?
+  specie   Species? @relation(fields: [specieId], references: [id], onDelete: SetNull)
+
+  @@map("specie_references")
 }
 
-model speciecontributionimg {
-  id        Int       @id @default(autoincrement())
-  data      DateTime? @db.Timestamp(6)
-  longitude Float?
-  latitude  Float?
-  exibir    String?   @db.VarChar(10)
-  name      String?   @db.VarChar(255)
-  email     String?   @db.VarChar(255)
-  location  String?   @db.VarChar(255)
-  phone     String?   @db.VarChar(255)
-  image     String?   @db.VarChar(255)
-  specieid  String?
-  especies  especies? @relation(fields: [specieid], references: [id], onDelete: NoAction, onUpdate: NoAction)
+model SpecieContribution {
+  id         Int       @id @default(autoincrement())
+  userId     String?
+  specieId  String?
+  submittedAt DateTime @default(now())
+
+  latitude   Float?
+  longitude  Float?
+  location   String?   @db.VarChar(255)
+  phone      String?   @db.VarChar(255)
+  isPublic   Boolean   @default(false)
+
+  user       User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  specie    Species?  @relation(fields: [specieId], references: [id], onDelete: Cascade)
+  images     SpecieImages[]
+
+  @@map("specie_contributions")
 }
 
-model speciereferences {
-  id        Int       @id @default(autoincrement())
-  reference String
-  specieid  String?
-  especies  especies? @relation(fields: [specieid], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_specie")
+model SpecieImages {
+  id                  Int               @id @default(autoincrement())
+  url                 String            @db.VarChar(255)
+  origin              ImageOrigin
+  approved            Boolean           @default(false)
+
+  specieId           String?           
+  contributionId      Int?
+
+  specie             Species?          @relation(fields: [specieId], references: [id], onDelete: Cascade)
+  contribution        SpecieContribution? @relation(fields: [contributionId], references: [id], onDelete: Cascade)
+
+  @@map("specie_images")
 }
 
-model speciesimage {
-  id           Int       @id @default(autoincrement())
-  specieid     String?
-  speciesimage String?
-  especies     especies? @relation(fields: [specieid], references: [id], onDelete: NoAction, onUpdate: NoAction)
+model Participation {
+  id         Int      @id @default(autoincrement())
+  name       String   @db.VarChar(100)
+  location   String   @db.VarChar(100)
+  message    String?
+  contact    String?  @db.VarChar(100)
+  createdAt  DateTime @default(now())
+
+  @@map("participations")
 }
