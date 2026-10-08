@@ -1,90 +1,90 @@
 # carboAPI
 
-API REST da plataforma **Carbonífera Biodiversa**, um catálogo colaborativo de fauna e flora da Região Carbonífera do Rio Grande do Sul, desenvolvido no IFSul.
+REST API for **[Carbonífera Biodiversa](https://github.com/gabrielssouza23/carboniferaBiodiversa)**, a collaborative catalog of the fauna and flora of the coal-mining region of Rio Grande do Sul, Brazil, built at IFSul.
 
-A API serve o catálogo de espécies, recebe contribuições da comunidade (fotos com geolocalização) e usa um modelo de visão (Llama 3.2 90B Vision, via NVIDIA API) para sugerir a identificação de espécies a partir de uma imagem.
+The API serves the species catalog, receives community contributions (geotagged photos) and uses a vision model (Llama 3.2 90B Vision, through the NVIDIA API) to suggest which species appear in a photo.
 
 ## Stack
 
 - **Node.js** + **Fastify 5** (ES Modules)
-- **PostgreSQL** com o driver [`postgres`](https://github.com/porsager/postgres) (queries com tagged templates)
-- **JWT** (`jsonwebtoken`) para autenticação das rotas administrativas
-- **ImgBB** para hospedagem das imagens enviadas
-- **NVIDIA API** (Llama 3.2 90B Vision) para análise de imagens
+- **PostgreSQL** with the [`postgres`](https://github.com/porsager/postgres) driver (tagged-template queries)
+- **JWT** (`jsonwebtoken`) for the admin routes
+- **ImgBB** to host uploaded images
+- **NVIDIA API** (Llama 3.2 90B Vision) for image analysis
 
-## Arquitetura
+## Architecture
 
 ```
 src/
-├── server.js          # instância do Fastify, CORS, multipart e registro das rotas
-├── routes/            # definição das rotas por domínio (species, admins, generic)
-├── controllers/       # integrações externas: upload no ImgBB e análise de imagem por IA
-├── models/            # acesso ao banco (SQL)
+├── server.js          # Fastify instance, CORS, multipart and route registration
+├── routes/            # routes per domain (species, admins, generic)
+├── controllers/       # external integrations: ImgBB uploads and AI image analysis
+├── models/            # database access (SQL)
 ├── plugins/
-│   └── authPlugin.js  # decorator `fastify.authenticate` que valida o Bearer token
-└── dbConn/db.js       # conexão com o Postgres
+│   └── authPlugin.js  # `fastify.authenticate` decorator that validates the Bearer token
+└── dbConn/db.js       # Postgres connection
 ```
 
-As rotas são registradas a partir de uma lista em `routes/index.js`, cada uma com seu prefixo. Rotas protegidas usam `preHandler: [fastify.authenticate]`.
+Routes are registered from a list in `routes/index.js`, each under its own prefix. Protected routes use `preHandler: [fastify.authenticate]`.
 
 ## Endpoints
 
-### Espécies (`/species`)
+### Species (`/species`)
 
-| Método | Rota | Auth | Descrição |
+| Method | Route | Auth | Description |
 |---|---|---|---|
-| GET | `/species/specie/:specieId` | — | Detalhes de uma espécie, com imagens e referências |
-| GET | `/species/species-all-catalog?limit=10&offset=0` | — | Catálogo paginado (id, nomes e thumb) |
-| GET | `/species/species-count` | — | Total de espécies cadastradas |
-| GET | `/species/species-all-crud` | — | Todas as espécies com todos os campos |
-| GET | `/species/specie-contributions/:specieId` | — | Imagens enviadas pela comunidade para a espécie |
-| GET | `/species/specie-locations/:specieId` | — | Coordenadas das contribuições da espécie |
-| POST | `/species/specie-create` | JWT | Cadastra espécie, sobe a thumb e as imagens extras no ImgBB |
-| POST | `/species/contribution-create` | — | Registra contribuição: fotos + latitude/longitude/data |
-| POST | `/species/analyze-image` | — | Envia a URL de uma imagem para identificação por IA |
+| GET | `/species/specie/:specieId` | — | Species details, with images and references |
+| GET | `/species/species-all-catalog?limit=10&offset=0` | — | Paginated catalog (id, names and thumbnail) |
+| GET | `/species/species-count` | — | Total number of species |
+| GET | `/species/species-all-crud` | — | All species with every field |
+| GET | `/species/specie-contributions/:specieId` | — | Community photos for a species |
+| GET | `/species/specie-locations/:specieId` | — | Coordinates of a species' sightings |
+| POST | `/species/specie-create` | JWT | Creates a species and uploads its thumbnail and extra images to ImgBB |
+| POST | `/species/contribution-create` | — | Saves a contribution: photos + latitude/longitude/date |
+| POST | `/species/analyze-image` | — | Sends an image URL to the vision model for identification |
 
-### Administração (`/admins`)
+### Admin (`/admins`)
 
-| Método | Rota | Descrição |
+| Method | Route | Description |
 |---|---|---|
-| POST | `/admins/admins-login` | Login com `email` e `senha`; retorna um JWT válido por 1h |
+| POST | `/admins/admins-login` | Login with `email` and `senha`; returns a JWT valid for 1 hour |
 
-### Geral (`/generic`)
+### General (`/generic`)
 
-| Método | Rota | Descrição |
+| Method | Route | Description |
 |---|---|---|
-| POST | `/generic/participacao` | Registra interesse em participar do projeto (`name`, `origin`, `message`, `contact`) |
+| POST | `/generic/participacao` | Registers interest in joining the project (`name`, `origin`, `message`, `contact`) |
 
-Exemplos de requisição estão em [`route.http`](./route.http) (extensão REST Client do VS Code).
+Request examples are in [`route.http`](./route.http) (VS Code REST Client).
 
-## Rodando localmente
+## Running locally
 
-Pré-requisitos: Node.js 18+ e um banco PostgreSQL com as tabelas do projeto (`especies`, `speciesImage`, `specieReferences`, `specieContributionImg`, `admins`, `participacoes`).
+Requirements: Node.js 18+ and a PostgreSQL database with the project tables (`especies`, `speciesImage`, `specieReferences`, `specieContributionImg`, `admins`, `participacoes`).
 
 ```bash
 npm install
 ```
 
-Crie um `.env` na raiz:
+Create a `.env` file in the root:
 
 ```env
 PGHOST=
 PGDATABASE=
 PGUSER=
 PGPASSWORD=
-ENDPOINT_ID=        # ID do endpoint (Neon)
+ENDPOINT_ID=        # Neon endpoint ID
 JWT_SECRET=
 IMGBB_API_KEY=
 NVIDIA_API=
-PORT=3333           # opcional, padrão 3333
+PORT=3333           # optional, defaults to 3333
 ```
 
-Inicie o servidor:
+Start the server:
 
 ```bash
 node index.js
-# ou, com reload automático:
+# or, with auto-reload:
 node --watch index.js
 ```
 
-A API sobe em `http://localhost:3333`.
+The API runs at `http://localhost:3333`.
